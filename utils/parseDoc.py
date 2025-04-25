@@ -7,6 +7,7 @@ from docx import Document
 from openai import OpenAI
 from fpdf import FPDF
 import re
+import random
 
 def save_uploaded_file(uploaded_file):
     suffix = Path(uploaded_file.name).suffix
@@ -34,23 +35,30 @@ def upload_resume_jd():
         st.session_state.jd = " "
     if "file_name" not in st.session_state:
         st.session_state.file_name = "No Name.pdf"
+    if "resume_present" not in st.session_state:
+        st.session_state.resume_present = False
 
     with st.form("upload_form"):
         uploaded_file = st.file_uploader("**Select Resume File**", type=["pdf", "docx"])
         jd_input = st.text_area("**Paste Job Description Here**", height=300, value=st.session_state.jd)
         submit = st.form_submit_button("Upload Resume & JD")
 
-    if submit:
-        st.session_state.jd = jd_input
-        st.success("Resume and JD uploaded successfully!")
-        if uploaded_file:
-            file_name = uploaded_file.name
-            path = save_uploaded_file(uploaded_file)
-            resume_text = parse_pdf(path) if path.lower().endswith(".pdf") else parse_docx(path)
-            st.session_state.resume_text = resume_text
-            st.session_state.file_name = file_name.split(".")[0]
-            os.unlink(path)
-        else:
-            st.warning("Please upload a PDF or DOCX file.")
+    # different UI for if resume already present or not
+    if st.session_state.resume_present == False:
+        if submit:
+            st.session_state.jd = jd_input
+            st.success("Resume and JD uploaded successfully!")
+            if uploaded_file:
+                file_name = uploaded_file.name
+                path = save_uploaded_file(uploaded_file)
+                resume_text = parse_pdf(path) if path.lower().endswith(".pdf") else parse_docx(path)
+                st.session_state.resume_text = resume_text
+                st.session_state.file_name = file_name.split(".")[0]
+                st.session_state.file_ext = file_name.split(".")[1]
+                os.unlink(path)
+                st.session_state.resume_present = True  # set the flag true; as at this point resume is uploaded
+            else:
+                st.warning("Please upload a PDF or DOCX file.")
 
     return st.session_state.resume_text, st.session_state.jd, st.session_state.file_name
+

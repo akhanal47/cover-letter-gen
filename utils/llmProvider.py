@@ -7,6 +7,7 @@ from docx import Document
 from openai import OpenAI
 from fpdf import FPDF
 import re
+import random
 
 # read the api key from user or env file, if not provided by user
 def get_api_key():
@@ -24,6 +25,29 @@ def get_api_key():
             st.session_state.apiKey = default_key
             st.warning("Please enter a valid API key; for now a default key is used.")
     return st.session_state.get("apiKey", default_key)
+
+def get_temperature():
+    temperature = st.slider("**Creativity:**", 0.0, 2.0, 0.7, 0.1)  # random temp between 0 and 2 for each run
+    st.session_state.temperature = temperature
+    return temperature
+
+def get_writing_style():
+    writing_style = st.selectbox(
+        "**Select Letter Style**",
+        ["professional", "sarcastic", "technical", "formal", "semi-formal", "creative", "persuasive", "humorous", "friendly"],
+        index=2
+    )
+    st.session_state.writing_style = writing_style
+    return st.session_state.writing_style
+
+def get_qa_writing_style():
+    qa_writing_style = st.selectbox(
+        "**Select Qns Ans Style**",
+        ["professional", "sarcastic", "technical", "formal", "semi-formal", "creative", "persuasive", "humorous", "friendly"],
+        index=1
+    )
+    st.session_state.qa_writing_style = qa_writing_style
+    return st.session_state.qa_writing_style
 
 # select the LLM to use, only Gemini is supported for now
 def get_llm_provider():
