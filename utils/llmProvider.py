@@ -62,7 +62,7 @@ def get_llm_provider():
     if provider == "Gemini":
         model_name = st.selectbox(
             "Select Gemini Model",
-            ["gemini-2.5-pro-exp-03-25", "gemini-2.0-flash-exp-image-generation", "gemini-2.0-flash-exp", "gemini-2.0-pro-exp-02-05"],
+            ["gemini-2.5-flash-preview-04-17", "gemini-2.0-flash-exp-image-generation", "gemini-2.0-flash-exp", "gemini-2.0-pro-exp-02-05"],
             index=0,
             key="gemini_model"
         )
