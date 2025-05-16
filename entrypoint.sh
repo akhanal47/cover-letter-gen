@@ -8,4 +8,4 @@ cloudflared tunnel --no-autoupdate run --token "$TUNNEL_TOKEN" --url http://loca
 streamlit run generateCoverLetter.py --server.address=0.0.0.0
 
 # --- Run Docker ----
-# docker run -d --env-file .env -e TUNNEL_TOKEN="token" -p 8501:8501 coverletter-app
+# docker run -d --env-file .env -e TUNNEL_TOKEN="token" -v "$(pwd)":/app -p 8501:8501 --name coverletter-app coverletter-app
