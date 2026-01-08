@@ -9,28 +9,23 @@ from fpdf import FPDF
 import re
 import json
 
-def load_prompts_from_file(filepath="prompts.json"):
+def load_prompts_from_file():
+    current_dir = os.path.dirname(__file__)
+    filepath = os.path.join(current_dir, "prompt.json")
+    
     try:
         if os.path.exists(filepath):
             with open(filepath, 'r') as f:
                 return json.load(f)
     except Exception as e:
-        print(f"Error loading prompts.json: {e}")
+        print(f"Error loading prompt.json: {e}")
     return None
 
 def letter_system_prompt(letter_writing_style):
-    default_prompt = f"""You are an expert Software Developer, given the Candidate Details and job description write a cover letter for the candidate.
-The cover letter should highlight candidate strength in lieu of the job description.
-Make the letter verbose, detailed and professional but not too long. 
-The cover letter should be structured in the following mannger, first line should be salutation, second line should be the subject, third line should be the body of the letter, and the last line should be the closing, followed by exit greeting and candidate name in the next line which is present in the candidate details. 
-Provide the cover letter in plain text letter format, which can be copied and pasted into a word document without editing. 
-There needs to a blank line between each line. 
-The body should be a single paragraph and should not contain a blank line at all. 
-The cover letter should be as much as humanly written.
-PLEASE, DO NOT HAVE ANY PLACEHOLDER TEXT IN THE LETTER.
-The writing style should be stricly be {letter_writing_style}"""
-    
-    prompts = load_prompts_from_file("prompts.json")
+    prompts = load_prompts_from_file()
+
+    default_sys = "You are an expert cover letter writer, given the Candidate Details and job description, Write a cover letter for the candidate. The cover letter should highlight candidate strength in lue of the job description. Strictly follow the instructions and the writing style provided"
+    default_user = "Write the best possible cover letter for the mentioned job descripton based on the mentioned resume. Make the letter verbose, detailed and professional but not too long. The cover letter should be structured in the following format, first line should be salutation, second line should be the subject, third line should be the body of the letter, divided into two paragraphs, and the last line should be the closing, followed by exit greeting and candidate name in the next line which is present in the candidate details. Provide the cover letter in plain text letter format, which can be copied and pasted into a word document without editing. There needs to a blank line between each line. The body can be single or two paragraphs at maximum. PLEASE, DO NOT HAVE ANY PLACEHOLDER TEXT IN THE LETTER. Make the letter as human as possible"
 
     if prompts:
         sys_part = prompts.get("SYSTEM_PROMPT", "")
@@ -38,11 +33,11 @@ The writing style should be stricly be {letter_writing_style}"""
         
         default_val = f"{sys_part}\n\n{user_part}\n\nThe writing style should be strictly {letter_writing_style}"
     else:
-        default_val = default_prompt
+        default_val = f"{default_sys}\n\n{default_user}\n\nThe writing style should be strictly {letter_writing_style}"
 
     if "sys_prompt" not in st.session_state:
         st.session_state.sys_prompt = default_val
-        
+
     sys_prompt = st.text_area("**System Prompt**", height=250, value=st.session_state.sys_prompt)
     st.session_state.sys_prompt = sys_prompt
     return sys_prompt
