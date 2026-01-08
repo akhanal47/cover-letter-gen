@@ -50,7 +50,7 @@ def main():
 
     # call the LLM and get the cover letter, this should happen only when the user clicks the button
     if st.button("Generate Cover Letter"):    
-        cover_letter = llmResponse.gemini_response(st.session_state.sys_prompt, 
+        cover_letter = llmResponse.api_response(st.session_state.sys_prompt, 
                                                    st.session_state.main_prompt, 
                                                    st.session_state.apiKey, 
                                                    st.session_state.model_name, 
@@ -81,7 +81,7 @@ def main():
 
     # generate answer to qns asked
     if st.button("Answer Question"):
-        qa_answer = llmResponse.gemini_response(st.session_state.qa_sys_prompt, 
+        qa_answer = llmResponse.api_response(st.session_state.qa_sys_prompt, 
                                                 st.session_state.qa_full_prompt, 
                                                 st.session_state.apiKey, 
                                                 st.session_state.model_name, 
