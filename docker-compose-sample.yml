@@ -1,0 +1,13 @@
+services:
+  coverletter-app:
+    build: .
+    container_name: coverletter-app
+    ports:
+      - "8501:8501"
+    environment:
+      - TUNNEL_TOKEN=<cloudflare_tunnel_token>
+      - GEMINI_KEY=<api_key>
+      - STREAMLIT_SERVER_RUN_ON_SAVE=true
+    volumes:
+      - .:/app
+    restart: always

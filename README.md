@@ -9,3 +9,7 @@ Generate cover letter (and directly download pdfs) for job application using can
 ### Usage Instructions
 1. Run the app ```streamlit run generateCoverLetter.py```
 2. Paste the API key generated in API key field; alternatively you can also create a ```.env``` file with respective key.
+
+
+### Just want to use it? 
+Go To: [Website](https://coverletter.testthissite.site/)

@@ -8,6 +8,8 @@ from openai import OpenAI
 from fpdf import FPDF
 import re
 import random
+import requests
+from datetime import timedelta
 
 # read the api key from user or env file, if not provided by user
 def get_api_key():
@@ -23,7 +25,7 @@ def get_api_key():
             st.session_state.apiKey = apiKey
         else:
             st.session_state.apiKey = default_key
-            st.warning("Please enter a valid API key; for now a default key is used.")
+            st.warning("Please enter a valid API key; for now a default GEMINI key is used.")
     return st.session_state.get("apiKey", default_key)
 
 def get_temperature():
@@ -51,24 +53,44 @@ def get_qa_writing_style():
 
 # select the LLM to use, only Gemini is supported for now
 def get_llm_provider():
+    model_map = get_model_data()
+    provider_list = list(model_map.keys())
+
     provider = st.selectbox(
         "Select LLM to use",
-        ["Gemini"],  # placeholder list
+        provider_list,  # get's from gist
         index=0,
         key="llm_provider"
     )
 
-    # for gemini, allow some model options
-    if provider == "Gemini":
-        model_name = st.selectbox(
-            "Select Gemini Model",
-            ["gemini-2.5-flash-preview-04-17", "gemini-2.0-flash-exp-image-generation", "gemini-2.0-flash-exp", "gemini-2.0-pro-exp-02-05"],
-            index=0,
-            key="gemini_model"
-        )
-        st.session_state.model_name = model_name
-        return provider, model_name
+    current_models = model_map.get(provider, [])
 
-    # set state vars
+    model_name = st.selectbox(
+        f"Select {provider} Model",
+        current_models,
+        index=0,
+        key="gemini_model"
+    )
+
+    # Set state vars
     st.session_state.provider = provider
-    return provider, None
+    st.session_state.model_name = model_name
+    
+    return provider, model_name
+
+@st.cache_data(ttl=timedelta(days=10))
+def get_model_data():
+    gist_url = "https://gist.githubusercontent.com/akhanal47/fd3eebb886053eee44f95735b4b9b848/raw/d8a3511fde4f08993066c09b0eb7254d24ae5211/free_apis.json"
+    
+    # fallback
+    fallback_data = {
+        "Gemini": ["gemini-2.5-flash-preview-04-17", "gemini-2.0-flash-exp-image-generation", "gemini-2.0-flash-exp", "gemini-2.0-pro-exp-02-05"]
+    }
+
+    try:
+        response = requests.get(gist_url)
+        if response.status_code == 200:
+            data = response.json()
+            return {item['provider']: item['model_names'] for item in data}
+    except Exception as e:
+        return fallback_data
